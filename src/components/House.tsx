@@ -3,7 +3,7 @@ import React from 'react';
 
 const House = ({ houseName }: { houseName: string }) => {
   return (
-    <section className="flex flex-col gap-4 border border-white p-4">
+    <section className="rounded flex flex-col gap-4 border border-black dark:border-white p-4">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
         House {houseName}
       </h2>

@@ -32,7 +32,7 @@ const DateRangePicker = ({ field }: { field: DateRangeField }) => {
           <Button
             id="date"
             variant={'outline'}
-            className="w-[300px] justify-start text-left font-normal"
+            className="w-[300px] justify-start text-left font-normal dark:border-gray-600 dark:bg-gray-800"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
 

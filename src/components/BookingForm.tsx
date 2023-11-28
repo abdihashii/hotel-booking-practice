@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
 const formSchema = z
   .object({
@@ -42,7 +43,7 @@ const formSchema = z
         {
           message:
             'Check-out date must be at least one day after the check-in date',
-        }
+        },
       ),
 
     guests: z.number().min(1, {
@@ -53,7 +54,7 @@ const formSchema = z
 
 const BookingForm = () => {
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
-    null
+    null,
   );
 
   // 1. Define a form
@@ -94,8 +95,8 @@ const BookingForm = () => {
       `dateRange: ${JSON.stringify(
         formattedValues.dateRange,
         null,
-        2
-      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`
+        2,
+      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`,
     );
   }
 
@@ -104,7 +105,7 @@ const BookingForm = () => {
   return (
     <Form {...form}>
       <form
-        className="flex w-1/2 flex-col gap-6 rounded-md border border-black p-4 lg:w-fit"
+        className="flex w-1/2 flex-col gap-12 rounded-md border border-black dark:border-white p-4 lg:w-fit"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
@@ -143,6 +144,7 @@ const BookingForm = () => {
                   type="number"
                   min={1}
                   onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                  className="dark:border-gray-600 dark:bg-gray-800"
                 />
               </FormControl>
 
@@ -151,15 +153,31 @@ const BookingForm = () => {
           )}
         />
 
-        <section className="flex flex-row justify-between">
-          <Button className="w-fit" type="submit">
+        <section className="flex flex-row justify-between gap-4">
+          <Button className="w-1/2" type="submit">
             Book Now
           </Button>
 
-          <Button onClick={handleGetValues} type="button" variant={'secondary'}>
-            Get Values
-          </Button>
+          <Link href="/" className="w-1/2">
+            <Button
+              className="w-full"
+              type="button"
+              variant={'destructive'}
+              color={'secondary'}
+            >
+              Cancel
+            </Button>
+          </Link>
         </section>
+
+        <Button
+          className="w-full"
+          onClick={handleGetValues}
+          type="button"
+          variant={'secondary'}
+        >
+          Get Values
+        </Button>
       </form>
     </Form>
   );
