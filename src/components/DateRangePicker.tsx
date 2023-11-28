@@ -1,11 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { format } from 'date-fns';
+import { addDays, format, startOfDay, startOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -20,7 +20,19 @@ interface DateRangeField {
   onChange: (range: DateRange | undefined) => void;
 }
 
-const DateRangePicker = ({ field }: { field: DateRangeField }) => {
+const DateRangePicker = ({
+  field,
+  unavailableDates,
+}: {
+  field: DateRangeField;
+  unavailableDates: Array<
+    | Date
+    | {
+        from: Date;
+        to: Date;
+      }
+  >;
+}) => {
   const handleDateChange = (range: DateRange | undefined) => {
     field.onChange(range);
   };
@@ -53,12 +65,23 @@ const DateRangePicker = ({ field }: { field: DateRangeField }) => {
       </PopoverTrigger>
 
       <PopoverContent className="w-auto p-0" align="start">
+        {JSON.stringify(field.value, null, 2)}
+
         <Calendar
           mode="range"
           defaultMonth={field.value.from}
-          selected={field.value}
+          selected={{
+            from: field.value.from,
+            to: field.value.to,
+          }}
           onSelect={handleDateChange}
+          fromMonth={startOfMonth(new Date())} // current month
+          toMonth={addDays(startOfMonth(new Date()), 365)} // 1 year
           numberOfMonths={2}
+          disabled={[
+            { before: startOfDay(new Date()) }, // disable dates before today
+            ...unavailableDates,
+          ]}
         />
       </PopoverContent>
     </Popover>
