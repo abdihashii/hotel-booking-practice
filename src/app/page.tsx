@@ -1,13 +1,13 @@
-import House from '@/components/House';
+import Block from '@/components/Block';
 
 export default function Home() {
   return (
     <main className="gap-4 flex flex-col">
       <section className="flex flex-col gap-8">
-        <House houseName="A" />
-        <House houseName="B" />
-        <House houseName="C" />
-        <House houseName="D" />
+        <Block blockName="A" />
+        <Block blockName="B" />
+        <Block blockName="C" />
+        <Block blockName="D" />
       </section>
     </main>
   );
