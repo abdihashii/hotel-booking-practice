@@ -75,6 +75,7 @@ const DateRangePicker = ({
             to: field.value.to,
           }}
           onSelect={handleDateChange}
+          showOutsideDays={false}
           fromMonth={startOfMonth(new Date())} // current month
           toMonth={addDays(startOfMonth(new Date()), 365)} // 1 year
           numberOfMonths={2}
