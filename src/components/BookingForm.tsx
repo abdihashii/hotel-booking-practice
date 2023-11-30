@@ -48,7 +48,7 @@ const formSchema = z
         {
           message:
             'Check-out date must be at least one day after the check-in date',
-        },
+        }
       ),
 
     guests: z.number().min(1, {
@@ -57,10 +57,10 @@ const formSchema = z
   })
   .required();
 
-const BookingForm = () => {
+const BookingForm = ({ blockName }: { blockName: string }) => {
   const supabase = createClientComponentClient<Database>();
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
-    null,
+    null
   );
   const [unavailableDates, setUnavailableDates] = useState<
     Array<Date | { from: Date; to: Date }>
@@ -96,8 +96,8 @@ const BookingForm = () => {
       `dateRange: ${JSON.stringify(
         formattedValues.dateRange,
         null,
-        2,
-      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`,
+        2
+      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`
     );
   }
 
@@ -108,6 +108,7 @@ const BookingForm = () => {
       const { data, error } = await supabase
         .from('bookings')
         .select()
+        .eq('block_name', blockName)
         .order('check_in_date', { ascending: true });
 
       if (error) throw error;
@@ -117,7 +118,7 @@ const BookingForm = () => {
         // Create a range of dates between the check-in and check-out dates
         return createDateRanges(
           new Date(booking.check_in_date),
-          new Date(booking.check_out_date),
+          new Date(booking.check_out_date)
         );
       });
 
@@ -141,7 +142,7 @@ const BookingForm = () => {
 
       if (fetchedUnavailableDates && fetchedUnavailableDates.length > 0) {
         const nearestAvailableDateRange = findNearestAvailableDateRange(
-          fetchedUnavailableDates,
+          fetchedUnavailableDates
         );
 
         // Update the form's default values with the nearest available date range

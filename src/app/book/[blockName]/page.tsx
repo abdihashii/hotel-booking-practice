@@ -23,7 +23,7 @@ export default function bookingPage({
         Book: {sanitizeBlockName(blockName)}
       </h1>
 
-      <BookingForm />
+      <BookingForm blockName={blockName} />
     </main>
   );
 }
