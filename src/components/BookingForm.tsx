@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Database } from '@/types/database.types';
+import useBookings from '@/hooks/useBookings';
 
 const startOfCurrentMonth = startOfMonth(new Date());
 
@@ -62,13 +63,8 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
     null
   );
-  const [unavailableDates, setUnavailableDates] = useState<
-    Array<Date | { from: Date; to: Date }>
-  >([]);
-  const [isLoading, setIsLoading] = useState({
-    bookings: false,
-    values: false,
-  });
+  const { unavailableDates, isLoading, handleGetBookings, setIsLoading } =
+    useBookings({ blockName });
 
   // 1. Define a form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -100,37 +96,6 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
       )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`
     );
   }
-
-  const handleGetBookings = async () => {
-    setIsLoading({ ...isLoading, bookings: true });
-
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select()
-        .eq('block_name', blockName)
-        .order('check_in_date', { ascending: true });
-
-      if (error) throw error;
-
-      // Process the booking dates to create an array of unavailable dates
-      const uD = data.map((booking) => {
-        // Create a range of dates between the check-in and check-out dates
-        return createDateRanges(
-          new Date(booking.check_in_date),
-          new Date(booking.check_out_date)
-        );
-      });
-
-      setUnavailableDates(uD);
-
-      return uD; // return the fetched unavailable dates
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading({ ...isLoading, bookings: false });
-    }
-  };
 
   const handleGetValues = () => {
     alert(JSON.stringify(form.getValues(), null, 2));
