@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import DarkModeToggle from '@/components/DarkModeToggle';
+import BackButton from '@/components/BackButton';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,24 +19,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} w-screen h-screen bg-gray-100 p-4 dark:bg-gray-800 dark:text-gray-100`}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
+        <body
+          className={`${inter.className} pt-8 w-screen h-screen bg-gray-100 dark:bg-gray-800 dark:text-gray-100`}
         >
-          <div className="mx-auto w-3/4 gap-4 flex flex-col">
-            <header className="self-end">
-              <DarkModeToggle />
-            </header>
+          <header className="mb-8 w-3/4 mx-auto flex flex-row items-center justify-between">
+            <BackButton className="mr-auto" />
 
-            {children}
-          </div>
-        </ThemeProvider>
-      </body>
+            <DarkModeToggle className="ml-auto" />
+          </header>
+
+          {children}
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

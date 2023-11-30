@@ -4,11 +4,14 @@ import { Button } from './ui/button';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-const DarkModeToggle = () => {
+const DarkModeToggle = ({ className }: { className?: string }) => {
   const { setTheme, theme } = useTheme();
 
   return (
-    <Button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+    <Button
+      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+      className={className}
+    >
       {theme === 'light' ? <Sun /> : <Moon />}
     </Button>
   );
