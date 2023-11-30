@@ -3,16 +3,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { addDays, format, startOfDay, startOfMonth } from 'date-fns';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { createDateRanges, findNearestAvailableDateRange } from '@/lib/utils';
+import { findNearestAvailableDateRange } from '@/lib/utils';
 
 import DateRangePicker from '@/components/DateRangePicker';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
@@ -24,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Database } from '@/types/database.types';
 import useBookings from '@/hooks/useBookings';
+import AvailabilityCalendar from './AvailabilityCalendar';
 
 const startOfCurrentMonth = startOfMonth(new Date());
 
@@ -49,7 +48,7 @@ const formSchema = z
         {
           message:
             'Check-out date must be at least one day after the check-in date',
-        }
+        },
       ),
 
     guests: z.number().min(1, {
@@ -61,7 +60,7 @@ const formSchema = z
 const BookingForm = ({ blockName }: { blockName: string }) => {
   const supabase = createClientComponentClient<Database>();
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
-    null
+    null,
   );
   const { unavailableDates, isLoading, handleGetBookings, setIsLoading } =
     useBookings({ blockName });
@@ -92,8 +91,8 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
       `dateRange: ${JSON.stringify(
         formattedValues.dateRange,
         null,
-        2
-      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`
+        2,
+      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`,
     );
   }
 
@@ -107,7 +106,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
 
       if (fetchedUnavailableDates && fetchedUnavailableDates.length > 0) {
         const nearestAvailableDateRange = findNearestAvailableDateRange(
-          fetchedUnavailableDates
+          fetchedUnavailableDates,
         );
 
         // Update the form's default values with the nearest available date range
@@ -134,7 +133,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
     <section className="items-center flex flex-col gap-20 w-full border">
       <Form {...form}>
         <form
-          className="flex w-1/2 flex-col gap-12 rounded-md border border-black dark:border-white p-6 lg:w-fit"
+          className="flex w-1/2 flex-col gap-8 rounded-md border border-black dark:border-white p-6 lg:w-fit"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -187,59 +186,19 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
             )}
           />
 
-          <section className="flex flex-row justify-between gap-4">
-            <Button className="w-1/2" type="submit">
-              Book Now
-            </Button>
+          <Button type="submit">Book Now</Button>
 
-            <Link href="/" className="w-1/2">
-              <Button
-                className="w-full"
-                type="button"
-                variant={'destructive'}
-                color={'secondary'}
-              >
-                Cancel
-              </Button>
-            </Link>
-          </section>
-
-          <Button
-            className="w-full"
-            onClick={handleGetValues}
-            type="button"
-            variant={'outline'}
-          >
+          <Button onClick={handleGetValues} type="button" variant={'outline'}>
             {isLoading.values ? 'Loading...' : 'Get Values'}
           </Button>
         </form>
       </Form>
 
-      <section className="flex flex-col gap-8">
-        <h2 className="text-3xl font-bold text-center">
-          Availability Calendar
-        </h2>
-
-        {isLoading.bookings ? (
-          <p className="self-center">Loading Availability Calendar...</p>
-        ) : (
-          <Calendar
-            className="w-full hover:cursor-default!"
-            mode="range"
-            numberOfMonths={3}
-            fromMonth={startOfCurrentMonth}
-            toMonth={addDays(startOfCurrentMonth, 365)}
-            showOutsideDays={false}
-            modifiers={{
-              unavailable: unavailableDates,
-            }}
-            modifiersClassNames={{
-              unavailable:
-                'bg-gray-300 hover:bg-gray-300 font-semibold text-gray-500 hover:text-gray-500 rounded',
-            }}
-          />
-        )}
-      </section>
+      <AvailabilityCalendar
+        isLoading={isLoading}
+        unavailableDates={unavailableDates}
+        startOfCurrentMonth={startOfCurrentMonth}
+      />
 
       <pre>
         <code>{JSON.stringify(unavailableDates, null, 2)}</code>
