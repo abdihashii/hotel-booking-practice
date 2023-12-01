@@ -130,7 +130,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
     <section className="items-center flex flex-col gap-20 w-full border">
       <Form {...form}>
         <form
-          className="w-fit flex flex-col gap-8 rounded-md border border-black dark:border-white p-6 lg:w-fit"
+          className="w-fit flex flex-col gap-8 rounded-md border-2 border-black dark:border-white p-6"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
