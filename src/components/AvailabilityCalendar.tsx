@@ -28,7 +28,7 @@ const AvailabilityCalendar = ({
         <Calendar
           className="w-full hover:cursor-default!"
           mode="range"
-          numberOfMonths={3}
+          numberOfMonths={1}
           fromMonth={startOfCurrentMonth}
           toMonth={addDays(startOfCurrentMonth, 365)}
           showOutsideDays={false}
