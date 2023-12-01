@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { addDays, format, startOfDay, startOfMonth } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -20,7 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Database } from '@/types/database.types';
 import useBookings from '@/hooks/useBookings';
 import AvailabilityCalendar from './AvailabilityCalendar';
 
@@ -58,7 +56,6 @@ const formSchema = z
   .required();
 
 const BookingForm = ({ blockName }: { blockName: string }) => {
-  const supabase = createClientComponentClient<Database>();
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
     null,
   );
@@ -133,7 +130,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
     <section className="items-center flex flex-col gap-20 w-full border">
       <Form {...form}>
         <form
-          className="flex w-1/2 flex-col gap-8 rounded-md border border-black dark:border-white p-6 lg:w-fit"
+          className="w-fit flex flex-col gap-8 rounded-md border border-black dark:border-white p-6 lg:w-fit"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -200,9 +197,9 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
         startOfCurrentMonth={startOfCurrentMonth}
       />
 
-      <pre>
+      {/* <pre>
         <code>{JSON.stringify(unavailableDates, null, 2)}</code>
-      </pre>
+      </pre> */}
     </section>
   );
 };
