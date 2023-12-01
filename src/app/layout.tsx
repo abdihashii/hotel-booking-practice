@@ -19,14 +19,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
+      <body
+        className={`${inter.className} pt-8 w-screen h-screen bg-gray-100 dark:bg-gray-800 dark:text-gray-100`}
       >
-        <body
-          className={`${inter.className} pt-8 w-screen h-screen bg-gray-100 dark:bg-gray-800 dark:text-gray-100`}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
         >
           <header className="mb-8 w-3/4 mx-auto flex flex-row items-center justify-between">
             <BackButton className="mr-auto" />
@@ -35,8 +35,8 @@ export default function RootLayout({
           </header>
 
           {children}
-        </body>
-      </ThemeProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
