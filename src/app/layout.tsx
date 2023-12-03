@@ -6,6 +6,7 @@ import DarkModeToggle from '@/components/DarkModeToggle';
 import BackButton from '@/components/BackButton';
 import AuthProvider from '@/components/AuthProvider';
 import { getSession } from '@/lib/supabaseServerClient';
+import SignOutButton from '@/components/SignOutButton';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,6 +38,8 @@ export default async function RootLayout({
             <BackButton className="mr-auto" />
 
             <DarkModeToggle className="ml-auto" />
+
+            {session && <SignOutButton />}
           </header>
 
           <AuthProvider accessToken={accessToken}>{children}</AuthProvider>
