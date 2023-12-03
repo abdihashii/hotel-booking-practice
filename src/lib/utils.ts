@@ -45,3 +45,13 @@ export const createDateRanges = (from: Date, to: Date) => {
   // Otherwise, return a range
   return { from: new Date(from), to: new Date(to) };
 };
+
+export const sanitizeBlockName = (bN: string) => {
+  // split between the dash
+  let [block, name] = bN.split('-');
+
+  // set block to title case
+  block = block.charAt(0).toUpperCase() + block.slice(1);
+
+  return `${block}-${name.toUpperCase()}`;
+};
