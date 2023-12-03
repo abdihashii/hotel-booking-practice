@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { getUser } from '@/lib/supabaseServerClient';
 import Link from 'next/link';
+import AdminPage from './AdminPage';
 
 export default async function adminPage() {
   const user = await getUser();
@@ -8,9 +9,7 @@ export default async function adminPage() {
   return (
     <main className="w-3/4 mx-auto">
       {user ? (
-        <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-gray-100">
-          Admin Page
-        </h1>
+        <AdminPage />
       ) : (
         <section className="w-full flex flex-col gap-4 items-center">
           <h1 className="text-3xl text-center font-bold text-gray-800 dark:text-gray-100">

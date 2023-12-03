@@ -4,6 +4,8 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import DarkModeToggle from '@/components/DarkModeToggle';
 import BackButton from '@/components/BackButton';
+import AuthProvider from '@/components/AuthProvider';
+import { getSession } from '@/lib/supabaseServerClient';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -12,11 +14,14 @@ export const metadata: Metadata = {
   description: 'Created using Next.js, TypeScript, Tailwind CSS, and Supabase',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getSession();
+  const accessToken = session?.access_token ?? null;
+
   return (
     <html lang="en">
       <body
@@ -34,7 +39,7 @@ export default function RootLayout({
             <DarkModeToggle className="ml-auto" />
           </header>
 
-          {children}
+          <AuthProvider accessToken={accessToken}>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
