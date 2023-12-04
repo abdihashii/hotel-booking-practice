@@ -21,6 +21,8 @@ import {
 import { Input } from '@/components/ui/input';
 import useBookings from '@/hooks/useBookings';
 import AvailabilityCalendar from './AvailabilityCalendar';
+import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 const startOfCurrentMonth = startOfMonth(new Date());
 
@@ -46,7 +48,7 @@ const formSchema = z
         {
           message:
             'Check-out date must be at least one day after the check-in date',
-        },
+        }
       ),
 
     guests: z.number().min(1, {
@@ -56,11 +58,20 @@ const formSchema = z
   .required();
 
 const BookingForm = ({ blockName }: { blockName: string }) => {
+  const { toast } = useToast();
+
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
-    null,
+    null
   );
-  const { unavailableDates, isLoading, handleGetBookings, setIsLoading } =
-    useBookings({ blockName });
+  const {
+    unavailableDates,
+    isLoading,
+    handleGetBookings,
+    bookABlock,
+    setIsLoading,
+  } = useBookings({
+    blockName,
+  });
 
   // 1. Define a form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,27 +86,29 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
   });
 
   // 2. Define a submit handler
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const formattedValues = {
       ...values,
       dateRange: {
-        from: format(values.dateRange.from, 'LLL dd, y'),
-        to: format(values.dateRange.to, 'LLL dd, y'),
+        from: format(values.dateRange.from, 'y-MM-dd'),
+        to: format(values.dateRange.to, 'y-MM-dd'),
       },
     };
 
-    alert(
-      `dateRange: ${JSON.stringify(
-        formattedValues.dateRange,
-        null,
-        2,
-      )}\n\nguests: ${JSON.stringify(formattedValues.guests, null, 2)}`,
-    );
-  }
+    setIsLoading({ ...isLoading, bookings: true });
 
-  const handleGetValues = () => {
-    alert(JSON.stringify(form.getValues(), null, 2));
-  };
+    try {
+      await bookABlock(formattedValues, 'John Doe');
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setIsLoading({ ...isLoading, bookings: false });
+
+      toast({
+        description: 'Booking successful!',
+      });
+    }
+  }
 
   useEffect(() => {
     const fetchAndSetInitialDates = async () => {
@@ -103,7 +116,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
 
       if (fetchedUnavailableDates && fetchedUnavailableDates.length > 0) {
         const nearestAvailableDateRange = findNearestAvailableDateRange(
-          fetchedUnavailableDates,
+          fetchedUnavailableDates
         );
 
         // Update the form's default values with the nearest available date range
@@ -122,6 +135,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
     };
 
     fetchAndSetInitialDates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs once on mount
 
   if (!initialDateRange) return null;
@@ -183,10 +197,12 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
             )}
           />
 
-          <Button type="submit">Book Now</Button>
-
-          <Button onClick={handleGetValues} type="button" variant={'outline'}>
-            {isLoading.values ? 'Loading...' : 'Get Values'}
+          <Button type="submit">
+            {isLoading.bookings ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              'Submit'
+            )}
           </Button>
         </form>
       </Form>
@@ -196,10 +212,6 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
         unavailableDates={unavailableDates}
         startOfCurrentMonth={startOfCurrentMonth}
       />
-
-      {/* <pre>
-        <code>{JSON.stringify(unavailableDates, null, 2)}</code>
-      </pre> */}
     </section>
   );
 };

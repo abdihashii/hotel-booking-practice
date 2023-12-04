@@ -48,14 +48,55 @@ export default function useBookings({ blockName }: { blockName: string }) {
     }
   };
 
+  const bookABlock = async (
+    values: {
+      dateRange: {
+        from: string;
+        to: string;
+      };
+      guests: number;
+    },
+    guestName: string
+  ) => {
+    const { data: bookings, error } = await supabase
+      .from('bookings')
+      .insert([
+        {
+          guest_name: guestName,
+          block_name: blockName,
+          check_in_date: values.dateRange.from,
+          check_out_date: values.dateRange.to,
+          num_guests: values.guests,
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    alert(JSON.stringify(bookings, null, 2));
+
+    // Process the booking dates to create an array of unavailable dates
+    const uD = bookings.map((booking) => {
+      // Create a range of dates between the check-in and check-out dates
+      return createDateRanges(
+        new Date(booking.check_in_date),
+        new Date(booking.check_out_date)
+      );
+    });
+
+    setUnavailableDates(uD);
+  };
+
   // useEffect(() => {
   //   handleGetBookings();
   // }, []);
 
   return {
     unavailableDates,
+    setUnavailableDates,
     isLoading,
     setIsLoading,
     handleGetBookings,
+    bookABlock,
   };
 }
