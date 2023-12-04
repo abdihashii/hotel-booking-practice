@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+
 import { ThemeProvider } from '@/components/theme-provider';
 import DarkModeToggle from '@/components/DarkModeToggle';
 import BackButton from '@/components/BackButton';
@@ -8,8 +11,6 @@ import AuthProvider from '@/components/AuthProvider';
 import { getSession } from '@/lib/supabaseServerClient';
 import SignOutButton from '@/components/SignOutButton';
 import { Toaster } from '@/components/ui/toaster';
-import { ShieldCheck } from 'lucide-react';
-import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
