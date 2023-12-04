@@ -8,6 +8,8 @@ import AuthProvider from '@/components/AuthProvider';
 import { getSession } from '@/lib/supabaseServerClient';
 import SignOutButton from '@/components/SignOutButton';
 import { Toaster } from '@/components/ui/toaster';
+import { ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,7 +42,15 @@ export default async function RootLayout({
 
             <DarkModeToggle className="ml-auto" />
 
-            {session && <SignOutButton />}
+            {session && (
+              <>
+                <SignOutButton />
+
+                <Link href="/admin">
+                  <ShieldCheck className="ml-4" />
+                </Link>
+              </>
+            )}
           </header>
 
           <AuthProvider accessToken={accessToken}>{children}</AuthProvider>
