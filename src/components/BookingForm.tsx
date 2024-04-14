@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { findNearestAvailableDateRange } from '@/lib/utils';
 
-import DateRangePicker from '@/components/DateRangePicker';
+import DateRangePicker from '@/components/Calendar/DateRangePicker';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import useBookings from '@/hooks/useBookings';
-import AvailabilityCalendar from './AvailabilityCalendar';
+import AvailabilityCalendar from './Calendar/AvailabilityCalendar';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -63,10 +63,11 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
   const [initialDateRange, setInitialDateRange] = useState<DateRange | null>(
     null
   );
+  debugger;
   const {
     unavailableDates,
     isLoading,
-    handleGetBookings,
+    handleGetUnavailableDates,
     bookABlock,
     setIsLoading,
   } = useBookings({
@@ -95,14 +96,14 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
       },
     };
 
-    setIsLoading({ ...isLoading, bookings: true });
+    setIsLoading(true);
 
     try {
       await bookABlock(formattedValues, 'John Doe');
     } catch (error: any) {
       alert(error.message);
     } finally {
-      setIsLoading({ ...isLoading, bookings: false });
+      setIsLoading(false);
 
       toast({
         description: 'Booking successful!',
@@ -112,7 +113,7 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
 
   useEffect(() => {
     const fetchAndSetInitialDates = async () => {
-      const fetchedUnavailableDates = await handleGetBookings(); // Fetch bookings first
+      const fetchedUnavailableDates = await handleGetUnavailableDates(); // Fetch bookings first
 
       if (fetchedUnavailableDates && fetchedUnavailableDates.length > 0) {
         const nearestAvailableDateRange = findNearestAvailableDateRange(
@@ -198,17 +199,12 @@ const BookingForm = ({ blockName }: { blockName: string }) => {
           />
 
           <Button type="submit">
-            {isLoading.bookings ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              'Submit'
-            )}
+            {isLoading ? <Loader2 className="animate-spin" /> : 'Submit'}
           </Button>
         </form>
       </Form>
 
       <AvailabilityCalendar
-        isLoading={isLoading}
         unavailableDates={unavailableDates}
         startOfCurrentMonth={startOfCurrentMonth}
       />

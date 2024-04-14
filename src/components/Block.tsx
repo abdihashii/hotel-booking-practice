@@ -1,8 +1,7 @@
+import React from 'react';
 import { createServerSupabaseClient } from '@/lib/supabaseServerClient';
-import { sanitizeBlockName } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 
 const Block = async ({ blockName }: { blockName: string }) => {
   const supabase = createServerSupabaseClient();
@@ -25,7 +24,7 @@ const Block = async ({ blockName }: { blockName: string }) => {
   return (
     <section className="items-center rounded flex flex-col gap-8 border border-black dark:border-white p-4">
       <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-        {sanitizeBlockName(blockName)}
+        {blockName}
       </h2>
 
       <Image
@@ -36,8 +35,8 @@ const Block = async ({ blockName }: { blockName: string }) => {
       />
 
       <Link
-        href={`/book/${blockName.toLowerCase()}`}
-        className="mt-auto w-full text-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        href={`/book/${blockName.toLowerCase().split(' ').join('-')}`}
+        className="w-full text-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
       >
         Book Now
       </Link>

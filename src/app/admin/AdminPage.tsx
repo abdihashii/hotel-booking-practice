@@ -1,14 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 import { Blocks } from '@/types';
 import { Database } from '@/types/database.types';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { addDays } from 'date-fns';
-import { useEffect, useState } from 'react';
+
 import useBookings from '@/hooks/useBookings';
-import AvailabilityCalendar from '@/components/AvailabilityCalendar';
+import { Button } from '@/components/ui/button';
+import AvailabilityCalendar from '@/components/Calendar/AvailabilityCalendar';
+import { Loader2 } from 'lucide-react';
 
 const startOfCurrentMonth = new Date(new Date().setDate(1));
 
@@ -16,33 +17,67 @@ const AdminPage = () => {
   const supabase = createClientComponentClient<Database>();
 
   const [blocks, setBlocks] = useState<Array<Blocks>>([]);
-  const [selectBlock, setSelectBlock] = useState<Blocks | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<Blocks | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { unavailableDates, handleGetBookings, isLoading } = useBookings({
-    blockName: selectBlock?.block_name ?? '',
+  const {
+    unavailableDates,
+    handleGetUnavailableDates,
+    isLoading: bookingsLoading,
+  } = useBookings({
+    blockName: selectedBlock?.block_name ?? '',
   });
 
-  const getAllBlocks = async () => {
+  const fetchAllBlocks = async (): Promise<Blocks[]> => {
     try {
       const { data: blocks, error } = await supabase
         .from('blocks')
         .select('*')
         .order('block_name', { ascending: true });
-      if (error) throw error;
+
+      if (error) {
+        console.error(error);
+        throw new Error('Failed to fetch blocks');
+      }
 
       return blocks;
     } catch (error) {
-      console.error(error);
+      console.error('Fetch error:', error);
+      return [];
     }
   };
 
   useEffect(() => {
-    getAllBlocks().then((b) => setBlocks(b ?? []));
+    const initData = async () => {
+      const allBlocks = await fetchAllBlocks();
+
+      if (allBlocks.length > 0) {
+        setBlocks(allBlocks);
+        setSelectedBlock(allBlocks[0]);
+      }
+      setIsLoading(false);
+    };
+
+    initData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    handleGetBookings();
-  }, [selectBlock]);
+    if (selectedBlock) {
+      handleGetUnavailableDates();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBlock]);
+
+  if (isLoading) {
+    // Handle overall loading state
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-8">
@@ -50,7 +85,7 @@ const AdminPage = () => {
         Admin Page
       </h1>
 
-      <div className="p-8 w-full border border-white space-y-12 min-h-[521px]">
+      <div className="p-8 w-full border border-black dark:border-white space-y-12 min-h-[521px]">
         <div className="flex flex-row gap-8 w-fit mx-auto">
           {blocks.map((block) => {
             return (
@@ -58,12 +93,12 @@ const AdminPage = () => {
                 key={block.id}
                 className={`text-xl font-semibold
                   ${
-                    selectBlock?.id === block.id
-                      ? 'bg-green-300 hover:bg-green-500'
+                    selectedBlock?.id === block.id
+                      ? 'bg-green-700 hover:bg-green-800 text-white'
                       : ''
                   }
                 `}
-                onClick={() => setSelectBlock(block)}
+                onClick={() => setSelectedBlock(block)}
               >
                 {block.block_name}
               </Button>
@@ -73,7 +108,6 @@ const AdminPage = () => {
 
         <AvailabilityCalendar
           className="w-fit mx-auto"
-          isLoading={isLoading}
           unavailableDates={unavailableDates}
           startOfCurrentMonth={startOfCurrentMonth}
           numberOfMonths={3}
